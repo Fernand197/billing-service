@@ -35,9 +35,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = invoiceMapper.fromInvoiceRequestDTO(invoiceRequestDTO);
         invoice.setId(UUID.randomUUID().toString());
         invoice.setDate(new Date());
-        // Customer customer = customerRestClient.getCustomer(invoice.getCustomerId());
-        // invoice.setCustomer(customer);
+        Customer customer = customerRestClient.getCustomer(invoice.getCustomerId());
         Invoice savedInvoice = invoiceRepository.save(invoice);
+        savedInvoice.setCustomer(customer);
         return invoiceMapper.fromInvoice(savedInvoice);
     }
 
@@ -55,6 +55,19 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         List<Invoice> invoices = invoiceRepository.findByCustomerId(customerId);
 
-        return invoices.stream().map(invoice -> invoiceMapper.fromInvoice(invoice)).collect(Collectors.toList());
+        return invoices.stream().map(invoice -> {
+            Customer customer = customerRestClient.getCustomer(invoice.getCustomerId());
+            invoice.setCustomer(customer);
+            return invoiceMapper.fromInvoice(invoice);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<InvoiceResponseDTO> allInvoices() {
+        return invoiceRepository.findAll().stream().map(invoice -> {
+            Customer customer = customerRestClient.getCustomer(invoice.getCustomerId());
+            invoice.setCustomer(customer);
+            return invoiceMapper.fromInvoice(invoice);
+        }).collect(Collectors.toList());
     }
 }

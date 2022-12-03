@@ -31,4 +31,9 @@ public class InvoiceRestController {
     public InvoiceResponseDTO save(@RequestBody InvoiceRequestDTO invoiceRequestDTO){
         return invoiceService.save(invoiceRequestDTO);
     }
+
+    @GetMapping(path = "/invoices")
+    public List<InvoiceResponseDTO> allInvoices() {
+        return invoiceService.allInvoices();
+    }
 }
